@@ -11,7 +11,9 @@ export async function POST(request) {
     }
 
     for (const field of required) {
-      if (!body[field] || String(body[field]).trim().length < 2) {
+      const value = body[field] == null ? '' : String(body[field]).trim();
+      const tooShort = field === 'experience' ? value.length < 1 : value.length < 2;
+      if (tooShort) {
         return NextResponse.json({ error: `Please provide ${field}.` }, { status: 400 });
       }
     }
