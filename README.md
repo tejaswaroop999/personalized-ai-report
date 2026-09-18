@@ -22,6 +22,8 @@ npm run dev
 
 Open http://localhost:3000.
 
+Live demo: https://personalized-ai-report.vercel.app
+
 ## Deploy to Vercel
 
 1. Push this folder to a public GitHub repository.
