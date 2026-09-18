@@ -6,6 +6,10 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json({ error: 'Please submit a valid profile.' }, { status: 400 });
+    }
+
     for (const field of required) {
       if (!body[field] || String(body[field]).trim().length < 2) {
         return NextResponse.json({ error: `Please provide ${field}.` }, { status: 400 });
@@ -15,6 +19,11 @@ export async function POST(request) {
     const input = Object.fromEntries(
       required.map((key) => [key, String(body[key]).trim().slice(0, 700)])
     );
+
+    const experience = Number(input.experience);
+    if (!Number.isFinite(experience) || experience < 0 || experience > 70) {
+      return NextResponse.json({ error: 'Years of experience must be a number between 0 and 70.' }, { status: 400 });
+    }
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({
@@ -60,7 +69,8 @@ Be specific, practical, and avoid generic motivational language.`;
         model: process.env.CLAUDE_MODEL || 'claude-sonnet-4-6',
         max_tokens: 900,
         messages: [{ role: 'user', content: prompt }]
-      })
+      }),
+      signal: AbortSignal.timeout(25000)
     });
 
     const data = await response.json();

@@ -15,9 +15,12 @@ label { display: block; color: #cbd3e4; font-size: 13px; margin: 17px 0; }
 input, textarea { width: 100%; margin-top: 8px; border: 1px solid #303a50; background: #0a101d; color: #f6f8ff; padding: 12px 13px; border-radius: 10px; outline: none; font: inherit; }
 input:focus, textarea:focus { border-color: #776dff; box-shadow: 0 0 0 3px rgba(119,109,255,.12); }
 textarea { min-height: 78px; resize: vertical; }
-button { width: 100%; border: 0; padding: 13px 16px; border-radius: 11px; background: linear-gradient(135deg, #7b6cff, #5d9cff); color: white; font-weight: 700; cursor: pointer; font-size: 15px; }
+button { width: 100%; border: 0; padding: 13px 16px; border-radius: 11px; background: linear-gradient(135deg, #7b6cff, #5d9cff); color: white; font-weight: 700; cursor: pointer; font-size: 15px; transition: transform .2s ease, filter .2s ease; }
+button:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 button:disabled { opacity: .6; cursor: wait; }
-.error { color: #ff9494; font-size: 13px; }
+.error, .status { font-size: 13px; line-height: 1.5; }
+.error { color: #ff9494; }
+.status { color: #9eb6ff; }
 .result { min-height: 590px; padding: 30px; }
 .empty { min-height: 520px; display: grid; place-content: center; text-align: center; max-width: 460px; margin: auto; color: #9ea9bd; }
 .empty h2 { color: #ecf1ff; margin-bottom: 4px; }
@@ -30,4 +33,10 @@ button:disabled { opacity: .6; cursor: wait; }
 .reportText p { margin: 7px 0; }
 .reportText .bullet { padding-left: 8px; }
 .spacer { height: 5px; }
+.resultActions { display: flex; gap: 10px; margin-top: 28px; padding-top: 18px; border-top: 1px solid #273149; }
+.secondaryButton, .textButton { width: auto; font-size: 13px; padding: 10px 13px; }
+.secondaryButton { background: #202b45; }
+.textButton { background: transparent; color: #aab9ff; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(139, 229, 199, .55); outline-offset: 2px; }
 @media (max-width: 850px) { .grid { grid-template-columns: 1fr; } .hero h1 { letter-spacing: -2px; } .shell { padding-top: 35px; } }
+@media (max-width: 520px) { .shell { width: min(100% - 20px, 1180px); padding-bottom: 28px; } .form, .result { padding: 20px; } .resultHead { flex-direction: column; } .resultActions { flex-direction: column; } .secondaryButton, .textButton { width: 100%; } }

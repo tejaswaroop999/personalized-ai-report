@@ -16,6 +16,7 @@ export default function Home() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const update = (event) => {
     const { name, value } = event.target;
@@ -27,6 +28,7 @@ export default function Home() {
     setLoading(true);
     setError('');
     setReport(null);
+    setCopied(false);
 
     try {
       const response = await fetch('/api/generate', {
@@ -45,6 +47,19 @@ export default function Home() {
     }
   }
 
+  function resetForm() {
+    setForm(initialForm);
+    setReport(null);
+    setError('');
+    setCopied(false);
+  }
+
+  async function copyReport() {
+    if (!report) return;
+    await navigator.clipboard.writeText(report.report);
+    setCopied(true);
+  }
+
   return (
     <main className="shell">
       <section className="hero">
@@ -54,18 +69,19 @@ export default function Home() {
       </section>
 
       <section className="grid">
-        <form className="card form" onSubmit={submit}>
+        <form className="card form" onSubmit={submit} aria-busy={loading}>
           <h2>Your profile</h2>
 
-          <label>Name<input name="name" value={form.name} onChange={update} placeholder="Teja" required /></label>
-          <label>Current role<input name="role" value={form.role} onChange={update} placeholder="Software Engineer" required /></label>
-          <label>Years of experience<input name="experience" value={form.experience} onChange={update} placeholder="2.5" required /></label>
-          <label>Career goal<textarea name="goal" value={form.goal} onChange={update} placeholder="Move into an AI engineering role..." required /></label>
-          <label>Main strengths<textarea name="strengths" value={form.strengths} onChange={update} placeholder="Backend, APIs, React, shipping fast..." required /></label>
-          <label>Biggest challenge<textarea name="challenge" value={form.challenge} onChange={update} placeholder="Need stronger ML system design and portfolio proof..." required /></label>
+          <label htmlFor="name">Name<input id="name" name="name" value={form.name} onChange={update} placeholder="Teja" autoComplete="name" required /></label>
+          <label htmlFor="role">Current role<input id="role" name="role" value={form.role} onChange={update} placeholder="Software Engineer" required /></label>
+          <label htmlFor="experience">Years of experience<input id="experience" name="experience" value={form.experience} onChange={update} placeholder="2.5" inputMode="decimal" required /></label>
+          <label htmlFor="goal">Career goal<textarea id="goal" name="goal" value={form.goal} onChange={update} placeholder="Move into an AI engineering role..." required /></label>
+          <label htmlFor="strengths">Main strengths<textarea id="strengths" name="strengths" value={form.strengths} onChange={update} placeholder="Backend, APIs, React, shipping fast..." required /></label>
+          <label htmlFor="challenge">Biggest challenge<textarea id="challenge" name="challenge" value={form.challenge} onChange={update} placeholder="Need stronger ML system design and portfolio proof..." required /></label>
 
-          <button disabled={loading}>{loading ? 'Generating…' : 'Generate my report'}</button>
-          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>{loading ? 'Generating your plan...' : 'Generate my report'}</button>
+          {loading && <p className="status" role="status">Reviewing your profile and shaping practical next steps.</p>}
+          {error && <p className="error" role="alert">{error}</p>}
         </form>
 
         <section className="card result">
@@ -85,6 +101,10 @@ export default function Home() {
                 <span className="mode">{report.provider}</span>
               </div>
               <Report text={report.report} />
+              <div className="resultActions">
+                <button type="button" className="secondaryButton" onClick={copyReport}>{copied ? 'Copied' : 'Copy report'}</button>
+                <button type="button" className="textButton" onClick={resetForm}>Start over</button>
+              </div>
             </>
           )}
         </section>
