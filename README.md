@@ -134,6 +134,18 @@ The Node test suite covers zero experience, deterministic fallback, malformed JS
 
 The route delegates to `lib/generate-report.mjs`, keeping the API logic testable with standard Request/Response objects. The invalid `next lint` script has been removed; no lint check is claimed.
 
+## Screenshots and demo recording
+
+The **Browser smoke checks and demo evidence** workflow starts the actual production build, exercises the no-key fallback at desktop (1440px) and mobile (390px) widths, and uploads `insightforge-demo-evidence`:
+
+- Desktop and mobile form/report screenshots
+- A desktop interaction recording (`desktop-demo.webm`)
+- Capture context identifying the deterministic fallback
+
+Open [Actions](https://github.com/tejaswaroop999/personalized-ai-report/actions/workflows/demo-evidence.yml), select a successful run, and download the artifact. These are actual browser captures, not generated mockups. The job verifies API success, all five report sections, reset behavior, page errors, and horizontal overflow. It makes no live Claude requests and needs no secrets.
+
+For local capture, install Playwright separately with `npm install --no-save --package-lock=false playwright@1.62.1` and `npx playwright install chromium`, start the production app with no API key, then run `node scripts/capture-demo.cjs`. Evidence is written under `demo-evidence/`.
+
 ## API contract
 
 `POST /api/generate` accepts `name`, `role`, `experience`, `goal`, `strengths`, and `challenge`. Text fields must be strings; experience may be a numeric string or a number from 0 to 70. Text is trimmed and truncated to 700 characters before prompt construction.
