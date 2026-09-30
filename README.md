@@ -144,7 +144,7 @@ The **Browser smoke checks and demo evidence** workflow starts the actual produc
 
 Open [Actions](https://github.com/tejaswaroop999/personalized-ai-report/actions/workflows/demo-evidence.yml), select a successful run, and download the artifact. These are actual browser captures, not generated mockups. The job verifies API success, all five report sections, reset behavior, page errors, and horizontal overflow. It makes no live Claude requests and needs no secrets.
 
-For local capture, install Playwright separately with `npm install --no-save --package-lock=false playwright@1.62.1` and `npx playwright install chromium`, start the production app with no API key, then run `node scripts/capture-demo.cjs`. Evidence is written under `demo-evidence/`.
+For local capture, install isolated tooling with `npm install --prefix /tmp/insightforge-browser --no-save --package-lock=false playwright@1.62.1` and `/tmp/insightforge-browser/node_modules/.bin/playwright install chromium`. Start the production app with no API key, then run `NODE_PATH=/tmp/insightforge-browser/node_modules node scripts/capture-demo.cjs`. The isolated installation preserves the application dependencies used by the build. Evidence is written under `demo-evidence/`.
 
 ## API contract
 
