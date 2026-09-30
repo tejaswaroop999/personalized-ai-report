@@ -64,7 +64,7 @@ The server route then:
 3. validates the numeric experience range
 4. builds a constrained prompt
 5. calls Anthropic with a 25-second timeout
-6. normalizes the returned text
+6. normalizes the returned text (the report is plain text, not schema-validated JSON)
 7. returns a report containing:
    - Snapshot
    - Strongest Advantages
@@ -86,7 +86,7 @@ The server route then:
 app/
 ├── api/
 │   └── generate/
-│       └── route.js      # validation, prompt construction, Claude call
+│       └── route.js      # thin POST adapter
 ├── globals.css           # application styling
 ├── layout.js             # app layout/metadata
 └── page.js               # form, API request, loading/error/result UI
@@ -123,6 +123,45 @@ Open http://localhost:3000.
 
 If `ANTHROPIC_API_KEY` is not configured, the app uses a local deterministic fallback so the full UI flow can still be tested.
 
+## Tests and CI
+
+```bash
+npm test
+npm run build
+```
+
+The Node test suite covers zero experience, deterministic fallback, malformed JSON, missing/invalid fields, input bounds, provider request construction, text normalization, non-success responses, invalid/empty output, and timeout/network errors. Provider calls are mocked; tests do not require keys or spend API credits. GitHub Actions runs tests and the production build.
+
+The route delegates to `lib/generate-report.mjs`, keeping the API logic testable with standard Request/Response objects. The invalid `next lint` script has been removed; no lint check is claimed.
+
+## API contract
+
+`POST /api/generate` accepts `name`, `role`, `experience`, `goal`, `strengths`, and `challenge`. Text fields must be strings; experience may be a numeric string or a number from 0 to 70. Text is trimmed and truncated to 700 characters before prompt construction.
+
+A successful response contains `title`, `provider`, and `report`. The report is plain text with five requested sections. Missing keys select the labeled local fallback. Provider failures never silently select that fallback.
+
+| Status | Meaning |
+| --- | --- |
+| 200 | Claude report or explicitly labeled no-key demo fallback |
+| 400 | Invalid JSON, required fields, types, or experience |
+| 502 | Provider HTTP/network error or malformed/empty output |
+| 504 | Provider request timeout |
+| 500 | Unexpected internal failure |
+
+## Architecture diagram
+
+```mermaid
+flowchart TD
+  A[React profile form] --> B[Server POST route]
+  B --> C[Validate and bound profile]
+  C --> D{API key configured?}
+  D -->|Yes| E[Claude with 25-second timeout]
+  D -->|No| F[Labeled local demo fallback]
+  E --> G[Text normalization or explicit error]
+  F --> H[Report view]
+  G --> H
+```
+
 ## Reliability and security choices
 
 ### Server-side provider call
@@ -139,7 +178,7 @@ The external model call uses a request timeout so the server does not wait indef
 
 ### Provider failure handling
 
-Non-success provider responses and empty model outputs are converted into explicit API errors instead of silently failing.
+Non-success responses, network failures, malformed provider data, and empty model outputs return 502. Timeouts return 504. Provider error bodies and credentials are not exposed in API responses.
 
 ## Current limitations
 
@@ -166,7 +205,7 @@ If scaling this into a larger product, I would add:
 7. evaluation datasets for report quality
 8. queue-based processing for longer jobs
 9. usage/cost tracking
-10. automated tests for API and UI flows
+10. browser-level UI tests (API tests are implemented)
 
 ## Interview talking points
 
@@ -180,6 +219,12 @@ This project is useful for discussing:
 - rate limiting, queues, persistence, and observability
 - evaluating model output quality rather than only checking API success
 
+## Portfolio context
+
+This public career-report app is distinct from any confidential commercial astrology/numerology report product. Commercial sales metrics should not be attributed to this repository.
+
+The companion [LLM Evaluation Platform](https://github.com/tejaswaroop999/llm-evaluation-platform) explores repeatable output checks. These projects are not directly integrated. A future connection would use exact match for fallback fixtures and structural/rubric checks for generated reports.
+
 ## Author
 
 **Teja Swaroop**  
@@ -187,3 +232,4 @@ Applied AI Engineer / Software Engineer
 
 - LinkedIn: https://www.linkedin.com/in/tejaswaroop999/
 - GitHub: https://github.com/tejaswaroop999
+
