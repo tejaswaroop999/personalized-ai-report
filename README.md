@@ -136,6 +136,18 @@ The route delegates to `lib/generate-report.mjs`, keeping the API logic testable
 
 ## Screenshots and demo recording
 
+Actual browser captures from September 30, 2026 using a sample zero-experience profile and the **Local demo fallback**. These illustrate the UI, not live Claude output.
+
+![Desktop career report using the labeled local fallback](screenshots/desktop-report.png)
+
+<details>
+<summary>Mobile report screenshot</summary>
+
+![Mobile career report using the labeled local fallback](screenshots/mobile-report.png)
+
+</details>
+
+
 The **Browser smoke checks and demo evidence** workflow starts the actual production build, exercises the no-key fallback at desktop (1440px) and mobile (390px) widths, and uploads `insightforge-demo-evidence`:
 
 - Desktop and mobile form/report screenshots
@@ -244,4 +256,5 @@ Applied AI Engineer / Software Engineer
 
 - LinkedIn: https://www.linkedin.com/in/tejaswaroop999/
 - GitHub: https://github.com/tejaswaroop999
+
 
